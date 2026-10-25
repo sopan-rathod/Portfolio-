@@ -1,4 +1,4 @@
-const menuToggle = document.getElementById("menuToggle");
+ const menuToggle = document.getElementById("menuToggle");
 const navLinks = document.getElementById("navLinks");
 
 // Mobile menu open and close
@@ -27,12 +27,13 @@ navLinks.querySelectorAll("a").forEach(function (link) {
 // Automatically update copyright year
 document.getElementById("currentYear").textContent =
     new Date().getFullYear();
+const API_BASE = "https://portfolio-backend-ilxk.onrender.com";
 
-// Contact form: prepare an email in the visitor's email app
 const contactForm = document.getElementById("contactForm");
 const formStatus = document.getElementById("formStatus");
 
-contactForm.addEventListener("submit", function (event) {
+if (contactForm && formStatus) {
+  contactForm.addEventListener("submit", async function (event) {
     event.preventDefault();
 
     const name = document.getElementById("visitorName").value.trim();
@@ -40,24 +41,38 @@ contactForm.addEventListener("submit", function (event) {
     const message = document.getElementById("visitorMessage").value.trim();
 
     if (!name || !email || !message) {
-        formStatus.textContent = "Please complete all fields.";
-        return;
+      formStatus.textContent = "Please complete all fields.";
+      return;
     }
 
-    const subject = "Portfolio enquiry from " + name;
+    formStatus.textContent = "Sending message...";
 
-    const body =
-        "Name: " + name + "\n" +
-        "Email: " + email + "\n\n" +
-        "Message:\n" + message;
+    try {
+      const response = await fetch(`${API_BASE}/api/contact`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          message: message
+        })
+      });
 
-    const mailtoLink =
-        "mailto:sopanrathod959@gmail.com" +
-        "?subject=" + encodeURIComponent(subject) +
-        "&body=" + encodeURIComponent(body);
+      const result = await response.json();
 
-    formStatus.textContent =
-        "Opening your email application...";
+      if (!response.ok) {
+        throw new Error(result.error || "Message could not be sent.");
+      }
 
-    window.location.href = mailtoLink;
-});
+      formStatus.textContent = "Message sent successfully!";
+      contactForm.reset();
+
+    } catch (error) {
+      console.error("Contact form error:", error);
+      formStatus.textContent =
+        "Message could not be sent. Please try again later.";
+    }
+  });
+}

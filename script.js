@@ -27,7 +27,7 @@ navLinks.querySelectorAll("a").forEach(function (link) {
 // Automatically update copyright year
 document.getElementById("currentYear").textContent =
     new Date().getFullYear();
-const API_BASE = "https://portfolio-backend-ilxk.onrender.com";
+const API_BASE = "https://portfolio-backend-llxk.onrender.com";
 
 const contactForm = document.getElementById("contactForm");
 const formStatus = document.getElementById("formStatus");
